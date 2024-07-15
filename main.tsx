@@ -1,6 +1,5 @@
-import { Hono,  } from "jsr:@hono/hono";
-import { serveStatic } from 'jsr:@hono/hono/deno'
-
+import { Hono } from "jsr:@hono/hono";
+import { serveStatic } from "jsr:@hono/hono/deno";
 
 const downloadToBuffer = async (url: string) => {
   const res = await fetch(url);
@@ -8,7 +7,7 @@ const downloadToBuffer = async (url: string) => {
 };
 
 const app = new Hono();
-app.use('/static/*', serveStatic({root: './'}))
+app.use("/static/*", serveStatic({ root: "./" }));
 
 app.get("/", (c) => {
   const content = (
@@ -22,23 +21,28 @@ app.get("/", (c) => {
       <body>
         <section>
           <header>
-              <h2>htmx+hono+webcomponent for the win</h2>
-              <p>Simple example of using htmx. The button will get /mock and replace the text "here".</p>
+            <h2>htmx+hono+webcomponent for the win</h2>
+            <p>
+              Simple example of using htmx. The button will GET /mock and
+              return:
+              <pre><code>&lt;cornerstone-viewport <span class="hljs-attribute">imageIds</span>=<span class="hljs-string">"wadouri:./static/test.dcm"</span>/&gt;</code></pre>.
+            </p>
           </header>
-          <button
-            class="btn"
-            hx-get="/mock"
-            hx-target="#user-details"
-          >
-            Let's Goooo!
-          </button>
           <hr />
           <div class="flex no-overflow">
-            <div id="user-details" class="flash grow m-1 bd-accent">
-              here
+            <div id="series" class="flash m-.25 bd-accent">
+              some series here
+              <br />
+              <button
+                class="btn"
+                hx-get="/mock"
+                hx-target="#viewport1"
+              >
+                Let's Goooo!
+              </button>
             </div>
-            <div id="user-details2" class="flash grow m-1 bd-active">
-              <cornerstone-viewport imageIds="wadouri:./static/test.dcm"></cornerstone-viewport>
+            <div id="viewport1" class="flash grow m-.25 bd-active">
+              GO?
             </div>
           </div>
           <footer>
@@ -51,12 +55,12 @@ app.get("/", (c) => {
   return c.html(content);
 });
 
+
+let mockCount = 0;
 app.get("/mock", (c) => {
+  mockCount++;
   return c.html(
-    <>
-      name
-      <p>some info</p>
-    </>,
+    <cornerstone-viewport count={mockCount} imageIds={`wadouri:./static/test${mockCount%2}.dcm`} />,
   );
 });
 

@@ -33,8 +33,9 @@ class CornerstoneElement extends HTMLElement {
 
     connectedCallback() {
         const element = document.createElement('div');
-        element.style.width = '500px';
-        element.style.height = '500px';
+        const { width } = getComputedStyle(this.parentElement)
+        element.style.width = width;
+        element.style.height = width;
         this.appendChild(element);
 
         const renderingEngineId = 'myRenderingEngine';

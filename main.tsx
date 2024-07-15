@@ -55,20 +55,20 @@ app.get("/", (c) => {
   return c.html(content);
 });
 
-
 let mockCount = 0;
 app.get("/mock", (c) => {
   mockCount++;
   return c.html(
-    <cornerstone-viewport count={mockCount} imageIds={`wadouri:./static/test${mockCount%2}.dcm`} />,
+    <cornerstone-viewport
+      count={mockCount}
+      imageIds={`wadouri:./static/test${mockCount % 2}.dcm`}
+    />,
   );
 });
 
 Deno.serve({
   port: 443,
-  onListen: () => {
-    console.log("Listening on https://127-0-0-1.traefik.me/");
-  },
+  onListen: () => console.log("Listening on https://127-0-0-1.traefik.me/"),
   cert: await downloadToBuffer("https://traefik.me/cert.pem"),
   key: await downloadToBuffer("https://traefik.me/privkey.pem"),
 }, app.fetch);

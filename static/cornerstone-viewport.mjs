@@ -45,6 +45,7 @@ cornerstoneDICOMImageLoader.webWorkerManager.initialize({
 });
 
 await cornerstone.init()
+await cornerstoneTools.init()
 
 // Create a class for the element
 class CornerstoneElement extends HTMLElement {
@@ -81,6 +82,8 @@ class CornerstoneElement extends HTMLElement {
         const viewport = renderingEngine.getViewport(viewportInput.viewportId);
         viewport.setStack(this.attributes.imageids.value.split(","));
         toolGroup.addViewport(viewportId, renderingEngineId);
+        renderingEngine.renderViewports([viewportId]);
+
         console.log("Custom element added to page.");
     }
 

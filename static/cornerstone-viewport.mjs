@@ -1,9 +1,33 @@
-import * as cornerstone from "https://esm.run/@cornerstonejs/core";
-import * as cornerstoneDICOMImageLoader from "https://esm.run/@cornerstonejs/dicom-image-loader";
-import dicomParser from "https://esm.run/dicom-parser";
+import * as cornerstone from "https://esm.sh/@cornerstonejs/core";
+import * as cornerstoneTools from "https://esm.sh/@cornerstonejs/tools";
+import * as cornerstoneDICOMImageLoader from "https://esm.sh/@cornerstonejs/dicom-image-loader";
+import dicomParser from "https://esm.sh/dicom-parser";
+
+cornerstoneTools.addTool(cornerstoneTools.ZoomTool);
+cornerstoneTools.addTool(cornerstoneTools.WindowLevelTool);
+const toolGroupId = 'myToolGroup';
+const toolGroup = cornerstoneTools.ToolGroupManager.createToolGroup(toolGroupId);
+toolGroup.addTool(cornerstoneTools.ZoomTool.toolName);
+toolGroup.addTool(cornerstoneTools.WindowLevelTool.toolName);
+toolGroup.setToolActive(cornerstoneTools.WindowLevelTool.toolName, {
+    bindings: [
+        {
+            mouseButton: cornerstoneTools.Enums.MouseBindings.Secondary, // Right Click
+        },
+    ],
+});
+
+toolGroup.setToolActive(cornerstoneTools.ZoomTool.toolName, {
+    bindings: [
+        {
+            mouseButton: cornerstoneTools.Enums.MouseBindings.Primary, // Left Click
+        },
+    ],
+});
 
 // console.log("dicomLoader", cornerstoneDICOMImageLoader)
 // console.log("cornerstone", cornerstone)
+// console.log("cornerstoneTools", cornerstoneTools)
 // console.log("dicomParser", dicomParser)
 
 cornerstoneDICOMImageLoader.external.cornerstone = cornerstone;
@@ -32,15 +56,20 @@ class CornerstoneElement extends HTMLElement {
     }
 
     connectedCallback() {
+        const shadow = this.attachShadow({ mode: "closed" });
         const element = document.createElement('div');
+
         const { width } = getComputedStyle(this.parentElement)
         element.style.width = width;
         element.style.height = width;
-        this.appendChild(element);
+        element.oncontextmenu = (e) => e.preventDefault();
+        shadow.appendChild(element);
 
         const renderingEngineId = 'myRenderingEngine';
         const viewportId = 'CT_AXIAL_STACK';
         const renderingEngine = new cornerstone.RenderingEngine(renderingEngineId);
+
+
 
         const viewportInput = {
             viewportId,
@@ -49,11 +78,9 @@ class CornerstoneElement extends HTMLElement {
         };
 
         renderingEngine.enableElement(viewportInput);
-
         const viewport = renderingEngine.getViewport(viewportInput.viewportId);
-
         viewport.setStack(this.attributes.imageids.value.split(","));
-
+        toolGroup.addViewport(viewportId, renderingEngineId);
         console.log("Custom element added to page.");
     }
 
